@@ -22,27 +22,51 @@ const MultipleSelection = () => {
     const [filteredState, setFilteredStates] = useState([...usStates])
     const [selected, setSelected] = useState([])
 
+    function replace(str, target) {
+        const regex = new RegExp(target, "i");
+        return str.replace(regex, target);
+    }
+
+
     const handelSuggestion = (e) =>{
         setSuggestionInput(e.target.value)
     }
+
     const handleChange = (e) => {
-        let filterd = usStates.filter(el => el.toLocaleLowerCase().includes(e.target.value.toLocaleLowerCase()))
-        if (!e.target.value.length) {
+        let value = e.target.value
+        let filterdUsStates = usStates.filter(el => el.toLocaleLowerCase().includes(value.toLocaleLowerCase()))
+        let filtered = filterdUsStates.filter(el => !selected.includes(el))
+        //dropdown logic
+        if (!value) {
             setDropdown(false)
         } else {
             setDropdown(true)
         }
-        if(!e.target.value.length && !selected.length){
+
+        //second input logic
+        if(!value && !selected.length){
             setSuggestionInput('Choose several states...')
-        }else{
+        }
+        else{
             setSuggestionInput('')
         }
-        setFilteredStates(filterd)
+
+        if (value) {
+            const match = filtered.find((s) =>
+              s.toLowerCase().startsWith(value.toLowerCase())
+            )
+            setSuggestionInput(match ? replace(match, value) : "");
+          } else {
+            setSuggestionInput("");
+          }
+
+        setFilteredStates(filtered)
         setInput(e.target.value)
     }
 
 
     const handleSelection = (state) => {
+        setSuggestionInput('')
         setFilteredStates([...usStates])
         setDropdown(false)
         setInput('')
@@ -127,7 +151,7 @@ const MultipleSelection = () => {
                                 )
                                 }
                                 {filteredState.map((el, index) => {
-                                    return (!selected.find(item => item.toLocaleLowerCase() === el.toLocaleLowerCase())) && (
+                                    return (
                                         <span
                                             key={index}
                                             onClick={() => handleSelection(el)}
