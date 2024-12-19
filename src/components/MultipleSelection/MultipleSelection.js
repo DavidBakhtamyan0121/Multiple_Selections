@@ -115,6 +115,8 @@ const MultipleSelection = () => {
                     console.log(selected);
                     setFocusIndex(selected.length-1)
                 }
+            }else if(e.key === "Tab"){
+                setInput(suggestionInput)
             }
         }
         document.addEventListener("mousedown", listener);
@@ -124,7 +126,7 @@ const MultipleSelection = () => {
             document.removeEventListener("mousedown", listener);
             window.removeEventListener("keydown", backspaceDelete)
         };
-    }, [focusIndex, selected, input]);
+    }, [focusIndex, selected, input, suggestionInput]);
 
     return (
         <div className={"MultipleSelection"}>
