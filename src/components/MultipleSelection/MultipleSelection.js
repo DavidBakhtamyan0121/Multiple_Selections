@@ -66,11 +66,12 @@ const MultipleSelection = () => {
 
 
     const handleSelection = (state) => {
+        inputRef.current.focus()
         setSuggestionInput('')
         setFilteredStates([...usStates])
         setDropdown(false)
         setInput('')
-        setSelected(prev => [...prev,state])
+        setSelected([...selected,state])
     }
 
     const removeSelection = (state) => {
@@ -103,14 +104,27 @@ const MultipleSelection = () => {
         setDropdown(false)
         setFocusIndex(-1)
     };
+    
     useEffect(() => {
-
+        const backspaceDelete = (e) =>{
+            if (e.key === 'Backspace' && !input) {            
+                if(focusIndex !== -1){
+                    setSelected(prev => prev.filter((el, index) => index !== focusIndex))
+                    setFocusIndex(-1)
+                }else{
+                    console.log(selected);
+                    setFocusIndex(selected.length-1)
+                }
+            }
+        }
         document.addEventListener("mousedown", listener);
+        window.addEventListener("keydown", backspaceDelete)
 
         return () => {
             document.removeEventListener("mousedown", listener);
+            window.removeEventListener("keydown", backspaceDelete)
         };
-    }, [inputRef, dropdownRef]);
+    }, [focusIndex, selected, input]);
 
     return (
         <div className={"MultipleSelection"}>
@@ -131,7 +145,7 @@ const MultipleSelection = () => {
                         <input
                             type="text"
                             className={'SelectionInput'}
-                            onFocus={() => setDropdown(true)}
+                            onClick={() => setDropdown(true)}
                             value={input}
                             onChange={handleChange}
                             ref={inputRef}
@@ -151,7 +165,7 @@ const MultipleSelection = () => {
                                 )
                                 }
                                 {filteredState.map((el, index) => {
-                                    return (
+                                    return (!selected.includes(el))&&(
                                         <span
                                             key={index}
                                             onClick={() => handleSelection(el)}
